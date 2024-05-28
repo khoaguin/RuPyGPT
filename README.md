@@ -4,7 +4,12 @@
     <img src="./assets/RuPyGPT-bannerV2.png">
 </p>
 
-ChatGPT character-level language modeling from scratch in Python and Rust. Based on Andrej Karpathy's [lecture](https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7) on building a GPT.
+ChatGPT character-level language modeling from scratch in Python and Rust: 
+<p align="center">
+    <img src="./assets/input-train-data.png">
+</p>
+
+where `18, 47...` are integer encodings of characters, e.g. `18` encodes `F`, `47` encodes `i`.
 
 ## Python Requirements
 
@@ -13,5 +18,5 @@ ChatGPT character-level language modeling from scratch in Python and Rust. Based
 - `uv pip install torch numpy transformers datasets tiktoken wandb tqdm`
 
 ## References
-
+- [Neural Network: Zero to Hero (Andrej Karpathy)](https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ)
 - [NanoGPT](https://github.com/karpathy/nanoGPT)
