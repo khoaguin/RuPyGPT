@@ -16,6 +16,7 @@ eval_interval = 300
 learning_rate = 1e-2
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters = 200
+n_embd = 32
 print(f'Using device {device}')
 # ------------
 
@@ -28,6 +29,8 @@ with open(file_path, 'r', encoding='utf-8') as f:
 # here are all the unique characters that occur in this text
 chars = sorted(list(set(text)))
 vocab_size = len(chars)
+print(f"{vocab_size = }")
+
 # create a mapping from characters to integers
 stoi = { ch:i for i,ch in enumerate(chars) }
 itos = { i:ch for i,ch in enumerate(chars) }
@@ -70,15 +73,21 @@ def estimate_loss():
 # super simple bigram model
 class BigramLanguageModel(nn.Module):
 
-    def __init__(self, vocab_size):
+    def __init__(self):
         super().__init__()
-        # each token directly reads off the logits for the next token from a lookup table
-        self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
+        # embed the identities of the tokens
+        self.token_embedding_table = nn.Embedding(num_embeddings=vocab_size, embedding_dim=n_embd)
+        # enbed the positions of the tokens
+        self.position_embedding_table = nn.Embedding(num_embeddings=block_size, embedding_dim=n_embd)
+        self.lm_head = nn.Linear(n_embd, vocab_size)
 
     def forward(self, idx, targets=None):
-
-        # idx and targets are both (B,T) tensor of integers
-        logits = self.token_embedding_table(idx) # (B,T,C)
+        B, T = idx.shape
+        # idx and targets are both (B, T) tensor of integers
+        tok_emb = self.token_embedding_table(idx) # (B, T, n_embd)
+        pos_emb = self.position_embedding_table(torch.arange(T, device=device))  # (T, n_embd)
+        x = tok_emb + pos_emb # (B, T, n_embd)
+        logits = self.lm_head(x) # (B, T, vocab_size)
 
         if targets is None:
             loss = None
@@ -105,7 +114,7 @@ class BigramLanguageModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         return idx
     
-model = BigramLanguageModel(vocab_size)
+model = BigramLanguageModel()
 m = model.to(device)
 
 # create a PyTorch optimizer
